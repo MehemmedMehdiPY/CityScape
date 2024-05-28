@@ -93,10 +93,7 @@ class CityScapeDataset(Dataset, ProcessingSupporter):
 
         image = np.load(image_filename)
         mask = np.load(mask_filename)
-
-        if not self.to_loader:
-            mask = self.colors[mask]
-
+        
         if self.to_loader:
             mask = mask[:, :, np.newaxis]
 
@@ -160,6 +157,8 @@ class CityScapeDataset(Dataset, ProcessingSupporter):
             raise Exception('You can\'t use plot_image or plot_mask while to_loader is True')
 
         _, mask = self.__getitem__(idx)
+        mask = self.colors[mask]
+        
         plt.imshow(mask)
         plt.axis('off')
         plt.show()

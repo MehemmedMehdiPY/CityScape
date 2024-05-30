@@ -140,11 +140,11 @@ class Trainer:
 
     def get_metrics(self, pred, label):
         accuracy_value = accuracy(pred, label, task='multiclass', num_classes=self.num_classes,
-                                  average='micro')
+                                  average='macro')
         miou_value = jaccard_index(pred, label, task='multiclass', num_classes=self.num_classes,
-                                   average='micro')
+                                   average='macro')
         f1_value = f1_score(pred, label, task='multiclass', num_classes=self.num_classes,
-                            average='micro')
+                            average='macro')
         return accuracy_value, miou_value, f1_value
 
     def run(self, epoch_start=0):

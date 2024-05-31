@@ -10,7 +10,12 @@ class Unet(nn.Module):
 
         self.device = ('cpu' if device is None
                   else device)
-              
+
+        if pretrained_encoder and encoder_path is None:
+            raise ValueError('encoder_path must be input while pretrained_encoder=True')
+        
+        super().__init__()
+
         if activation_function is None:
             self.activation_function = lambda x: x
         
@@ -25,10 +30,6 @@ class Unet(nn.Module):
                 'No such function {} accepted'.format(activation_function)
                 )
 
-        if pretrained_encoder and encoder_path is None:
-            raise ValueError('encoder_path must be input while pretrained_encoder=True')
-        
-        super().__init__()
         self.encoder_name = encoder_name
         self.encoder_depth = encoder_depth
         self.encoder_weights = encoder_weights

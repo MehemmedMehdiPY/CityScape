@@ -304,6 +304,8 @@ class BiSeNetV1(nn.Module):
                  extractor_path: str = None
                  ):
         
+        super(BiSeNetV1, self).__init__()
+
         if activation_function is None:
             self.activation_function = lambda x: x
         
@@ -318,7 +320,6 @@ class BiSeNetV1(nn.Module):
                 'No such function {} accepted'.format(activation_function)
                 )
         
-        super(BiSeNetV1, self).__init__()
         self.cp = ContextPath(feature_extractor=context_feature_extractor, 
                               is_pretrained_extractor=is_pretrained_extractor,
                               extractor_path=extractor_path

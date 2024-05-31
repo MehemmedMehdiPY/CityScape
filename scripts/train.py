@@ -17,8 +17,7 @@ class InitScheduler():
 class Trainer:
     def __init__(self, model: torch.nn.Module, train_loader: torch.utils.data.DataLoader, val_loader: torch.utils.data.DataLoader,
                  optimizer: torch.optim.Adam, loss_fn: torch.nn.modules.loss.BCELoss, epochs: int, filepath: str, 
-                 activation_function: str = None, num_classes: int = 2, scheduler = None, is_context_loss: bool=False, 
-                 device: Optional[str] = None):
+                 num_classes: int = 2, scheduler = None, is_context_loss: bool=False, device: Optional[str] = None):
         """The class to support training process
 
         Args:
@@ -44,20 +43,6 @@ class Trainer:
         self.train_len = len(self.train_loader)
         self.val_len = len(self.val_loader)
         
-        if activation_function is None:
-            self.activation_function = lambda x: x
-        
-        elif activation_function == 'sigmoid':
-            self.activation_function = nn.Sigmoid(dim=1)
-
-        elif activation_function == 'softmax':
-            self.activation_function = nn.Softmax(dim=1)
-
-        else:
-            raise ValueError(
-                'No such function {} accepted'.format(activation_function)
-                )
-                
         self.epochs = epochs
         self.filepath = filepath
         self.num_classes = num_classes

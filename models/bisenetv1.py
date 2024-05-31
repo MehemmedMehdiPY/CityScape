@@ -308,10 +308,10 @@ class BiSeNetV1(nn.Module):
             self.activation_function = lambda x: x
         
         elif activation_function == 'sigmoid':
-            self.activation_function = nn.Sigmoid().to(self.device)
+            self.activation_function = nn.Sigmoid()
 
         elif activation_function == 'softmax':
-            self.activation_function = nn.Softmax(dim=1).to(self.device)
+            self.activation_function = nn.Softmax(dim=1)
 
         else:
             raise ValueError(

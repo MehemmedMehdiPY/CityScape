@@ -300,8 +300,24 @@ class FeatureFusionModule(nn.Module):
 class BiSeNetV1(nn.Module):
 
     def __init__(self, n_classes, aux_mode='train', context_feature_extractor = 'xception', 
-                 is_pretrained_extractor: bool = False, extractor_path: str = None
+                 activation_function: str =  None, is_pretrained_extractor: bool = False, 
+                 extractor_path: str = None
                  ):
+        
+        if activation_function is None:
+            self.activation_function = lambda x: x
+        
+        elif activation_function == 'sigmoid':
+            self.activation_function = nn.Sigmoid().to(self.device)
+
+        elif activation_function == 'softmax':
+            self.activation_function = nn.Softmax(dim=1).to(self.device)
+
+        else:
+            raise ValueError(
+                'No such function {} accepted'.format(activation_function)
+                )
+        
         super(BiSeNetV1, self).__init__()
         self.cp = ContextPath(feature_extractor=context_feature_extractor, 
                               is_pretrained_extractor=is_pretrained_extractor,
@@ -323,12 +339,18 @@ class BiSeNetV1(nn.Module):
         feat_fuse = self.ffm(feat_sp, feat_cp8)
 
         feat_out = self.conv_out(feat_fuse)
+        feat_out = self.activation_function(feat_out)
         if self.aux_mode == 'train':
             feat_out16 = self.conv_out16(feat_cp8)
             feat_out32 = self.conv_out32(feat_cp16)
+
+            feat_out16 = self.activation_function(feat_out16)
+            feat_out32 = self.activation_function(feat_out32)
             return feat_out, feat_out16, feat_out32
+        
         elif self.aux_mode == 'eval':
             return feat_out
+        
         elif self.aux_mode == 'pred':
             feat_out = feat_out.argmax(dim=1)
             return feat_out

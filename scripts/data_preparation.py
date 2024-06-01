@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 import torch
 from torch.utils.data import Dataset, DataLoader, random_split
 from torch.nn import functional as f
+import albumentations
 
 class ProcessingSupporter:
     def __init__(self):
@@ -15,6 +16,7 @@ class ProcessingSupporter:
         pass
 
     def free_outliers(self, image, whis=1.5):
+        """Outlier Mitigation"""
         q1, q3 = np.quantile(image, q=[0.25, 0.75], axis=[-2, -1])
         iqr = q3 - q1
 
@@ -29,12 +31,14 @@ class ProcessingSupporter:
         return image
 
     def min_max_scaler(self, image, eps=1e-16):
+        """Scaling"""
         image_min = 0
         image_max = 255
         image = (image - image_min) / (image_max - image_min + eps)
         return image
 
     def split(self, indexes, train_size=0.75, seed=None):
+        """Dataset splitting"""
         if seed:
             torch.random.manual_seed(seed=seed)
 
@@ -42,8 +46,19 @@ class ProcessingSupporter:
         return train_indexes, val_indexes
 
 class CityScapeDataset(Dataset, ProcessingSupporter):
-    def __init__(self, root, colors, to_loader=False, transform = None, transform_image = None, 
-                 num_classes = 2, train_size=0.75, seed=None):
+    def __init__(self, root: str, colors: np.darray, to_loader: bool = False, transform: albumentations.core.composition.Compose = None, 
+                 transform_image: albumentations.core.composition.Compose = None, num_classes: int = 2, 
+                 train_size: float = 0.75, seed: int = None):
+        """The class to support data preparation
+        root:                       Dataset path
+        colors:                     Unique color codes for classes
+        to_loader:                  If True, some processing techniques will be added for data loader.
+        transform:                  Used to support augmentation in both images and masks
+        transform_image:            Used to support augmentation in only images
+        num_classes:                The number of classes in the mask
+        train_size:                 The measure to indicate the split size of training data
+        seed:                       Randomness of dataset splitting           
+        """
         super().__init__()
 
         self.root = root

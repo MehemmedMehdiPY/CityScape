@@ -19,21 +19,20 @@ class Trainer:
                  optimizer: torch.optim.Adam, loss_fn: torch.nn.modules.loss.BCELoss, epochs: int, filepath: str, 
                  num_classes: int = 2, scheduler = None, is_context_loss: bool=False, device: Optional[str] = None):
         """The class to support training process
-
         Args:
-            model:                    __main__.UNet or __main__.Deeplabv3
-            train_loader:             torch.utils.data.dataloader.DataLoader
-            val_loader:               torch.utils.data.dataloader.DataLoader
-            optimizer:                torch.optim.adam.Adam
-            loss_fn:                  torch.nn.modules.loss.BCELoss
-            epochs:                   int
-
-        model is the object to train the model>
-        train_loader is the object containing training dataset at pre-defined batch size
-        val_loader is the object containing validation dataset at pre-defined batch size
-        optimizer is the object to optimize the model parameters
-        loss_fn is the object to measure the loss of model output
+            model:                    Model to train
+            train_loader:             Data Loader for training set
+            val_loader:               Data Loader for validation set
+            optimizer:                Optimizer
+            loss_fn:                  Loss function
+            epochs:                   The number of epochs for training
+            filepath:                 Filepath to save the training model
+            num_classes:              The number of channels in the output
+            scheduler:                Learning scheduler
+            is_context_loss:          If True, BiSeNet-V1 training will be adjusted
+            device:                   Device to use trainer object
         """
+
         self.model = model
         self.train_loader = train_loader
         self.val_loader = val_loader
@@ -54,10 +53,10 @@ class Trainer:
         self.device = (device if device is not None else 'cpu')
         self.history = []
 
-        if not os.path.exists('track_of_best_results'):
-            os.mkdir('track_of_best_results')
+        if not os.path.exists('./track_of_best_results'):
+            os.mkdir('./track_of_best_results')
 
-    def train_model(self, epoch):
+    def train_model(self, epoch: int) -> float:
         """The function to train the model
 
             Args:
@@ -65,7 +64,9 @@ class Trainer:
 
             Returns:
                 train_loss       float
-
+            
+            It saves other metrices, such as accuracy, f1 score, mean IOU with TensorBoard.
+            Flexible for training with both U-Net and BiSeNet-V1
         """
 
         self.model.train()
@@ -101,13 +102,14 @@ class Trainer:
             train_loss = train_loss / self.train_len
         return train_loss
 
-    def evaluate_model(self, threshold: Optional[float] = None) -> Tuple[float]:
-        """The function to evaluate the model performance
+    def evaluate_model(self) -> Tuple[float]:
+        """The function to evaluate the model performance.
 
             Returns:
                   test_loss              float
                   avg_accuracy           torch.float32
                   avg_miou               torch.float32
+                  avg_f1                 torch.float32
         """
 
         self.model.eval()
@@ -139,7 +141,8 @@ class Trainer:
 
         return test_loss, avg_accuracy, avg_miou, avg_f1
 
-    def get_metrics(self, pred, label):
+    def get_metrics(self, pred, label) -> Tuple[float]: 
+        """The function to compute accuracy, mean IOU and F1 score"""
         accuracy_value = accuracy(pred, label, task='multiclass', num_classes=self.num_classes,
                                   average='macro')
         miou_value = jaccard_index(pred, label, task='multiclass', num_classes=self.num_classes,
@@ -148,8 +151,8 @@ class Trainer:
                             average='macro')
         return accuracy_value, miou_value, f1_value
 
-    def run(self, epoch_start=0):
-        """Run :D"""
+    def run(self, epoch_start: Optional[int] = 0) -> None:
+        """The function to control training"""
         writer = SummaryWriter()
 
         best_f1 = 0
@@ -172,6 +175,7 @@ class Trainer:
             writer.add_scalar("Score/F1", avg_f1, epoch + 1)
 
             if avg_f1 > best_f1:
+                # Saving the best model
                 print('The best model is saved at {:.3f}'.format(avg_f1))
                 with open('track_of_best_results/track.txt', 'w') as fo:
                     fo.write("f1: {}".format(avg_f1))

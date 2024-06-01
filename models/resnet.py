@@ -65,6 +65,13 @@ def create_layer_basic(in_chan, out_chan, bnum, stride=1):
 
 class Resnet18(nn.Module):
     def __init__(self, pretrained: bool = False, extractor_path: str = None):
+        """
+        Args:
+            pretrained:             If False, weights will be initialized randomly, otherwise, 
+                                    will be loaded from path specified in extractor_path
+            extractor_path:         If pretrained=True, path must be supplied to load weights of 
+                                    ResNet
+        """
         super(Resnet18, self).__init__()
         
         self.pretrained = pretrained

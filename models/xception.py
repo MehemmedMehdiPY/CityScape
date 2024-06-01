@@ -246,7 +246,4 @@ def xception(num_classes=1000, pretrained='imagenet', extractor_path=None):
         model.mean = settings['mean']
         model.std = settings['std']
 
-    # # TODO: ugly
-    # model.last_linear = model.fc
-    # del model.fc
     return model

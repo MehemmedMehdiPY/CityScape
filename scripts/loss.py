@@ -2,22 +2,6 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-"""Focal Loss"""
-# from torchvision import ops
-
-# class FocalLoss(nn.Module):
-#     def __init__(self, alpha: float = 0.25, gamma: float = 2, reduction: str = 'none') -> torch.Tensor:
-#         super().__init__()
-#         self.alpha = alpha
-#         self.gamma = gamma
-#         self.reduction = reduction
-#         self.loss_fn = ops.sigmoid_focal_loss
-
-#     def __call__(self, inputs, targets):
-#         loss = self.loss_fn(inputs=inputs, targets=targets, alpha=self.alpha, 
-#                             gamma=self.gamma, reduction=self.reduction)
-#         return loss
-
 
 """The code was taken from the below repository:
     https://github.com/shuaizzZ/Dice-Loss-PyTorch/blob/master/dice_loss.py

@@ -299,10 +299,22 @@ class FeatureFusionModule(nn.Module):
 
 class BiSeNetV1(nn.Module):
 
-    def __init__(self, n_classes, aux_mode='train', context_feature_extractor = 'xception', 
+    def __init__(self, n_classes: int, aux_mode: str = 'train', context_feature_extractor: str = 'xception', 
                  activation_function: str =  None, is_pretrained_extractor: bool = False, 
                  extractor_path: str = None
                  ):
+        """
+        Args:
+            n_classes:                               Used to indicate the number of classes for classification problem.
+            aux_mode:                                The mode of process. It is advised to initialize the model with the default
+                                                     train model so that the mode can be changed later.
+            context_feature_extractor:               The name of feature extractor in context path: xception or resnet
+            activation_function:                     The name of activation function in final layer: softmax, sigmoid, or None
+            is_pretrained_extractor:                 If False, feature_extractor in context path will be randomly initialized. 
+                                                     If True, feature extractor states in context path will be loaded from extractor_path
+            extractor_path:                          Path to feature extractor in context path. If is_pretrained_extractor=True, the path
+                                                     must be supplied    
+        """
         
         super(BiSeNetV1, self).__init__()
 

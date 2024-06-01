@@ -5,8 +5,22 @@ from typing import Optional, Tuple
 
 class Unet(nn.Module):
     def __init__(self, encoder_name: Optional[str] = 'resnet18', encoder_depth: Optional[int] = 5, encoder_weights: Optional[str] = None, 
-                 decoder_channels: Optional[Tuple] = (256, 128, 64, 32, 16), in_channels: Optional[int] = 3, activation_function: str =  None,
-                 pretrained_encoder: bool = False, encoder_path: str = None, num_classes: Optional[int] = 1, device: Optional[str] = None) -> None:
+                 decoder_channels: Optional[Tuple] = (256, 128, 64, 32, 16), in_channels: Optional[int] = 3, activation_function: Optional[str] =  None,
+                 pretrained_encoder: Optional[bool] = False, encoder_path: str = None, num_classes: Optional[int] = 1, device: Optional[str] = None) -> None:
+        """
+        Args:
+            encoder_name:                   The name of feature extractor encoder
+            encoder_depth:                  The number of stages till bottleneck
+            encoder_weights:                Encoder weights
+            decoder_channels:               Channels of decoder in each stage
+            in_channels:                    The number of channels in the input
+            activation_function:            The name of activation function in final layer: softmax, sigmoid, or None
+            pretrained_encoder:             If False, weights will be randomly initialized, otherwise, will be loaded
+                                            from the path specified in encoder_path
+            encoder_path:                   The path to encoder weights
+            num_classes:                    The number of channels in the output
+            device:                         Device to run the model        
+        """
 
         self.device = ('cpu' if device is None
                   else device)
